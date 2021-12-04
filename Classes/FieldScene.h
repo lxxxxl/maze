@@ -14,6 +14,18 @@ class FieldScene : public Scene
 {
 public:
 
+    enum Direction{
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    };
+
+    enum CellType{
+        WALL,
+        CLEAR
+    };
+
     static Scene* createScene();
     virtual bool init();
     CREATE_FUNC(FieldScene);
@@ -21,11 +33,20 @@ public:
     // move sprite to specified location.
     // x and y are in tileno, NOT screen coords
     void setNewCoords(Sprite *sprite, int x, int y);
+    // mark selected point as CLEAR
+    void makeClear(int x, int y);
+    // generate maze
+    void mazeGenerate();
+    // optimize maze by removing dead ends
+    void mazeOptimize();
+    // draw maze on tilemap
+    void mazeDraw();
 
 private:
     TMXTiledMap *_tileMap;
     TMXLayer *_background;
     TMXLayer *_maze;
+    u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
 };
 
 #endif // __FIELD_SCENE_H__
