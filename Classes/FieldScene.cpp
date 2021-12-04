@@ -173,12 +173,17 @@ void FieldScene::mazeOptimize()
 
 void FieldScene::mazeDraw()
 {
+    // tiles IDs with static objects
+    // will use as obstacles
+    // TODO add multi-tiled obstacles
+    u_short _wallTiles[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ,27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 164, 165, 166, 167, 188, 195, 202, 209, 216, 222, 223, 229, 230, 236, 237, 238, 239, 240, 241, 242, 243, 244};
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++){
             if (_mazeMap[x][y] != WALL)
                 continue;
             Vec2 pos(x*SPRITE_SIZE, y * SPRITE_SIZE); 
-            auto sprite = spriteFromTileset(48);
+            auto randomTile = _wallTiles[RandomHelper::random_int(0, (int)(sizeof(_wallTiles) / sizeof(u_short))-1)];
+            auto sprite = spriteFromTileset(randomTile);
             sprite->setPosition(pos);
             _maze->addChild(sprite);
         }
