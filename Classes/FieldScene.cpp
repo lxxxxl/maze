@@ -26,6 +26,7 @@ bool FieldScene::init()
     mazeGenerate();
     mazeOptimize();
     mazeDraw();
+    placeEndpoint();
 
     // 4. add decorations
 
@@ -186,6 +187,21 @@ void FieldScene::mazeDraw()
             auto sprite = spriteFromTileset(randomTile);
             sprite->setPosition(pos);
             _maze->addChild(sprite);
+        }
+}
+
+void FieldScene::placeEndpoint()
+{
+    for (int x = FIELD_WIDTH-1; x > 0; x--)
+        for (int y = 0; y < FIELD_HEIGHT; y++){
+            if (_mazeMap[x][y] == WALL)
+                continue;
+
+            _endpoint = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            auto sprite = spriteFromTileset(207);
+            sprite->setPosition(_endpoint);
+            _maze->addChild(sprite);
+            return;
         }
 }
 
