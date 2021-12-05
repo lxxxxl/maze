@@ -15,20 +15,13 @@ bool FieldScene::init()
         return false;
     }
 
-    // 2. init tilemap
-    _tileMap = new TMXTiledMap();
-    _tileMap->initWithTMXFile("res/map.tmx");
-    _background = _tileMap->getLayer("background");
-    _maze = _tileMap->getLayer("maze");
-    this->addChild(_tileMap, -1);
-
-    // 3. generate maze
+    // 2. generate maze
     mazeGenerate();
     mazeOptimize();
     mazeDraw();
     placeEndpoint();
 
-    // 4. add decorations
+    // 4. TODO
 
     return true;
 }
@@ -177,16 +170,23 @@ void FieldScene::mazeDraw()
     // tiles IDs with static objects
     // will use as obstacles
     // TODO add multi-tiled obstacles
-    u_short _wallTiles[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ,27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 164, 165, 166, 167, 188, 195, 202, 209, 216, 222, 223, 229, 230, 236, 237, 238, 239, 240, 241, 242, 243, 244};
+    u_short _wallTiles[] = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ,27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 164, 165, 166, 167, 188, 195, 202, 209, 216, 222, 223, 229, 230, 236, 237, 238, 239, 240, 241, 242, 243, 244};
+
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++){
+            // add ground tile
+            Vec2 pos(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            auto sprite = spriteFromTileset(3);
+            sprite->setPosition(pos);
+            this->addChild(sprite);
+            // add wall
+            auto tile = _wallTiles[RandomHelper::random_int(0, (int)(sizeof(_wallTiles) / sizeof(u_short))-1)];
             if (_mazeMap[x][y] != WALL)
                 continue;
-            Vec2 pos(x*SPRITE_SIZE, y * SPRITE_SIZE); 
-            auto randomTile = _wallTiles[RandomHelper::random_int(0, (int)(sizeof(_wallTiles) / sizeof(u_short))-1)];
-            auto sprite = spriteFromTileset(randomTile);
-            sprite->setPosition(pos);
-            _maze->addChild(sprite);
+            pos = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            auto sprite2 = spriteFromTileset(tile);
+            sprite2->setPosition(pos);
+            this->addChild(sprite2);
         }
 }
 
@@ -200,7 +200,7 @@ void FieldScene::placeEndpoint()
             _endpoint = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
             auto sprite = spriteFromTileset(207);
             sprite->setPosition(_endpoint);
-            _maze->addChild(sprite);
+            this->addChild(sprite);
             return;
         }
 }
@@ -215,7 +215,7 @@ Sprite *FieldScene::spriteFromTileset(int gid)
 {
     int y = gid / SPRITES_PER_LINE;
     int x = gid % SPRITES_PER_LINE;
-    auto sprite = Sprite::create("res/toen.png", Rect(x * SPRITE_SIZE, y * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    auto sprite = Sprite::create("toen.png", Rect(x * SPRITE_SIZE, y * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
     sprite->setAnchorPoint(Vec2(0, 0));
     return sprite;
 }

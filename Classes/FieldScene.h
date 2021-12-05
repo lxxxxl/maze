@@ -45,9 +45,6 @@ public:
     void placeEndpoint();
 
 private:
-    TMXTiledMap *_tileMap;
-    TMXLayer *_background;
-    TMXLayer *_maze;
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Vec2 _endpoint;
 };
