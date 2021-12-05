@@ -167,12 +167,7 @@ void FieldScene::mazeOptimize()
 
 void FieldScene::mazeDraw()
 {
-    // tiles IDs with static objects
-    // will use as obstacles
-    // TODO add multi-tiled obstacles
-    u_short _wallTiles[] = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 ,27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 164, 165, 166, 167, 188, 195, 202, 209, 216, 222, 223, 229, 230, 236, 237, 238, 239, 240, 241, 242, 243, 244};
-
-    for (int x = 0; x < FIELD_WIDTH; x++)
+        for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++){
             // add ground tile
             Vec2 pos(x*SPRITE_SIZE, y * SPRITE_SIZE);
@@ -180,7 +175,7 @@ void FieldScene::mazeDraw()
             sprite->setPosition(pos);
             this->addChild(sprite);
             // add wall
-            auto tile = _wallTiles[RandomHelper::random_int(0, (int)(sizeof(_wallTiles) / sizeof(u_short))-1)];
+            auto tile = getTileId(x, y);
             if (_mazeMap[x][y] != WALL)
                 continue;
             pos = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
@@ -188,6 +183,149 @@ void FieldScene::mazeDraw()
             sprite2->setPosition(pos);
             this->addChild(sprite2);
         }
+}
+
+int FieldScene::getTileId(int x, int y)
+{
+
+    // tiles IDs with static objects
+    // will use as obstacles
+    u_char _wallTiles[] = {7, 8, 9, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
+
+    /* encode tile state into bitmask. neighbor: 0 - clear 1 - wall
+     * bits:
+     * 0 1 2
+     * 7 X 3
+     * 6 5 4
+     */
+
+    int wallMask = 0;
+
+    if ((y + 1 < FIELD_HEIGHT) && (x - 1 >= 0))
+        wallMask |= (_mazeMap[x - 1][y + 1] == WALL) << 0;
+    if ((y + 1 < FIELD_HEIGHT))
+        wallMask |= (_mazeMap[x][y + 1] == WALL) << 1;
+    if ((y + 1 < FIELD_HEIGHT) && (x + 1 < FIELD_WIDTH))
+        wallMask |= (_mazeMap[x + 1][y + 1] == WALL) << 2;
+    if ((x + 1 < FIELD_WIDTH))
+        wallMask |= (_mazeMap[x + 1][y] == WALL) << 3;
+    if ((y - 1 >= 0) && (x + 1 < FIELD_WIDTH))
+        wallMask |= (_mazeMap[x + 1][y - 1] == WALL) << 4;
+    if ((y - 1 >= 0))
+        wallMask |= (_mazeMap[x][y - 1] == WALL) << 5;
+    if ((y - 1 >= 0) && (x - 1 >= 0))
+        wallMask |= (_mazeMap[x - 1][y - 1] == WALL) << 6;
+    if (x - 1 >= 0)
+        wallMask |= (_mazeMap[x - 1][y] == WALL) << 7;
+
+
+    switch (wallMask) {
+    case 0b00001000:
+    case 0b10000000:
+    case 0b10001000:
+    case 0b11001000:
+    case 0b10011000:
+    case 0b11111000:
+    case 0b10001001:
+    case 0b10001100:
+    case 0b10011001:
+    case 0b10011111:
+    case 0b11111001:
+    case 0b10001111:
+    case 0b11111100:
+    case 0b11001001:
+    case 0b11001111:
+    case 0b10011100:
+    case 0b00001100:
+    case 0b11001100:
+    case 0b11011111:
+    case 0b10001101:
+    case 0b11111101:
+    case 0b10011101:
+        return 220;
+
+    case 0b00100010:
+    case 0b00111111:
+    case 0b00111110:
+    case 0b00000100:
+    case 0b01000100:
+    case 0b00000010:
+    case 0b11110011:
+    case 0b11100011:
+    case 0b00110010:
+    case 0b00100011:
+    case 0b11100111:
+    case 0b01100010:
+    case 0b01100110:
+    case 0b00100000:
+    case 0b00110011:
+    case 0b01111110:
+    case 0b00100110:
+    case 0b01100011:
+    case 0b01110010:
+    case 0b01111111:
+    case 0b00100111:
+        return 226;
+
+    case 0b00101110:
+    case 0b00111010:
+    case 0b11101011:
+    case 0b00101010:
+        return 218;
+
+
+    case 0b00111000:
+    case 0b01111000:
+    case 0b11101111:
+    case 0b00101000:
+        return 219;
+
+    case 0b11100000:
+    case 0b11110000:
+    case 0b10111111:
+    case 0b10100000:
+        return 221;
+
+    case 0b00001110:
+    case 0b00011110:
+    case 0b00001010:
+    case 0b11111011:
+        return 233;
+
+    case 0b10000011:
+    case 0b11111110:
+    case 0b10000010:
+        return 235;
+
+    case 0b11101000:
+    case 0b10111000:
+    case 0b10101000:
+        return 224;
+
+    case 0b10001110:
+    case 0b10101111:
+    case 0b11111010:
+    case 0b10001011:
+    case 0b10001010:
+        return 225;
+
+    case 0b10111110:
+    case 0b10100011:
+    case 0b10100010:
+    case 0b11100010:
+        return 217;
+
+    case 0b10111011:
+    case 0b10101011:
+    case 0b11101110:
+    case 0b10111010:
+    case 0b11101010:
+        return 227;
+
+    default:
+        return _wallTiles[RandomHelper::random_int(0, (int)sizeof(_wallTiles)-1)];
+
+    }
 }
 
 void FieldScene::placeEndpoint()

@@ -26,6 +26,7 @@ public:
         CLEAR
     };
 
+
     static Scene* createScene();
     virtual bool init();
     CREATE_FUNC(FieldScene);
@@ -43,6 +44,8 @@ public:
     void mazeDraw();
     // locate and draw endpoint
     void placeEndpoint();
+    // get wall tile acording to road position
+    int getTileId(int x, int y);
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
