@@ -63,6 +63,11 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
                         _player->runAction(action);
                     }
                     break;
+
+                case EventKeyboard::KeyCode::KEY_ESCAPE:
+                    auto menu = MenuScene::create();
+                    Director::getInstance()->replaceScene(menu);
+                    break;
             }
 }
 
