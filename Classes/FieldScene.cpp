@@ -282,6 +282,13 @@ int FieldScene::getTileId(int x, int y)
     case 0b10001101:
     case 0b11111101:
     case 0b10011101:
+    case 0b11011000:
+    case 0b11011100:
+    case 0b11001101:
+    case 0b00011000:
+    case 0b11011001:
+    case 0b00011100:
+    case 0b11011101:
         return 220;
 
     case 0b00100010:
@@ -305,6 +312,15 @@ int FieldScene::getTileId(int x, int y)
     case 0b01110010:
     case 0b01111111:
     case 0b00100111:
+    case 0b01100000:
+    case 0b00110000:
+    case 0b00110111:
+    case 0b01110011:
+    case 0b01100111:
+    case 0b01110110:
+    case 0b00110110:
+    case 0b01110111:
+    case 0b01110000:
         return 226;
 
     case 0b00101110:
@@ -360,6 +376,8 @@ int FieldScene::getTileId(int x, int y)
     case 0b11101110:
     case 0b10111010:
     case 0b11101010:
+    case 0b10101110:
+    case 0b10101010:
         return 227;
 
     default:
