@@ -34,8 +34,6 @@ public:
     // move sprite to specified location.
     // x and y are in tileno, NOT screen coords
     void setNewCoords(Sprite *sprite, int x, int y);
-    // mark selected point as CLEAR
-    void makeClear(int x, int y);
     // generate maze
     void mazeGenerate();
     // optimize maze by removing dead ends
@@ -46,10 +44,14 @@ public:
     void placeEndpoint();
     // get wall tile acording to road position
     int getTileId(int x, int y);
+    // keyboard event handler
+    void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Vec2 _endpoint;
+    Sprite *_player;
+
 };
 
 #endif // __FIELD_SCENE_H__

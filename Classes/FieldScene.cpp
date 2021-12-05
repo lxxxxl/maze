@@ -21,14 +21,49 @@ bool FieldScene::init()
     mazeDraw();
     placeEndpoint();
 
-    // 4. TODO
+    // 3. add player
+    _player = spriteFromTileset(252);
+    _player->setPosition(Vec2(0 * SPRITE_SIZE, (FIELD_HEIGHT-1) * SPRITE_SIZE));
+    this->addChild(_player);
 
+    //4. add keyboard listener
+    auto eventListener = EventListenerKeyboard::create();
+    eventListener->onKeyPressed = CC_CALLBACK_2(FieldScene::onKeyPressed, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
     return true;
 }
 
-void FieldScene::makeClear(int x, int y)
+void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
+    int x = _player->getPosition().x / SPRITE_SIZE;
+    int y = _player->getPosition().y / SPRITE_SIZE;
 
+    switch(keyCode){
+                case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+                    if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR){
+                        auto action = MoveBy::create(0.1f, Vec2(-SPRITE_SIZE, 0));
+                        _player->runAction(action);
+                    }
+                    break;
+                case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+                    if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR){
+                        auto action = MoveBy::create(0.1f, Vec2(SPRITE_SIZE, 0));
+                        _player->runAction(action);
+                    }
+                    break;
+                case EventKeyboard::KeyCode::KEY_UP_ARROW:
+                    if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR){
+                        auto action = MoveBy::create(0.1f, Vec2(0, SPRITE_SIZE));
+                        _player->runAction(action);
+                    }
+                    break;
+                case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+                    if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR){
+                        auto action = MoveBy::create(0.1f, Vec2(0, -SPRITE_SIZE));
+                        _player->runAction(action);
+                    }
+                    break;
+            }
 }
 
 void FieldScene::mazeGenerate()
@@ -170,7 +205,7 @@ void FieldScene::mazeDraw()
         for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++){
             // add ground tile
-            Vec2 pos(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            Vec2 pos(x * SPRITE_SIZE, y * SPRITE_SIZE);
             auto sprite = spriteFromTileset(3);
             sprite->setPosition(pos);
             this->addChild(sprite);
@@ -178,7 +213,7 @@ void FieldScene::mazeDraw()
             auto tile = getTileId(x, y);
             if (_mazeMap[x][y] != WALL)
                 continue;
-            pos = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            pos = Vec2(x * SPRITE_SIZE, y * SPRITE_SIZE);
             auto sprite2 = spriteFromTileset(tile);
             sprite2->setPosition(pos);
             this->addChild(sprite2);
