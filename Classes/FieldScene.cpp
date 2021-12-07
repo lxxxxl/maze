@@ -38,37 +38,56 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
     int x = _player->getPosition().x / SPRITE_SIZE;
     int y = _player->getPosition().y / SPRITE_SIZE;
 
+    auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
+    MoveBy *action = nullptr;
+
     switch(keyCode){
                 case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
                     if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR){
-                        auto action = MoveBy::create(0.1f, Vec2(-SPRITE_SIZE, 0));
-                        _player->runAction(action);
+                        action = MoveBy::create(0.1f, Vec2(-SPRITE_SIZE, 0));
+
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
                     if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR){
-                        auto action = MoveBy::create(0.1f, Vec2(SPRITE_SIZE, 0));
-                        _player->runAction(action);
+                        action = MoveBy::create(0.1f, Vec2(SPRITE_SIZE, 0));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_UP_ARROW:
                     if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR){
-                        auto action = MoveBy::create(0.1f, Vec2(0, SPRITE_SIZE));
-                        _player->runAction(action);
+                        action = MoveBy::create(0.1f, Vec2(0, SPRITE_SIZE));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
                     if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR){
-                        auto action = MoveBy::create(0.1f, Vec2(0, -SPRITE_SIZE));
-                        _player->runAction(action);
+                        action = MoveBy::create(0.1f, Vec2(0, -SPRITE_SIZE));
                     }
                     break;
 
-                case EventKeyboard::KeyCode::KEY_ESCAPE:
-                    auto menu = MenuScene::create();
-                    Director::getInstance()->replaceScene(menu);
-                    break;
+                default:
+                    return;
             }
+    if (action != nullptr)
+        _player->runAction(Sequence::create(action, winCallback, nullptr));
+}
+
+void FieldScene::win()
+{
+    if ((_player->getPosition().x == _endpoint.x) && (_player->getPosition().y == _endpoint.y)){
+        int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
+        int centerY = Director::getInstance()->getOpenGLView()->getFrameSize().height / 2;
+        auto sprite = Sprite::create("like.png");
+        sprite->setScale(4.0f);
+        sprite->setPosition(Vec2(centerX, centerY));
+        addChild(sprite);
+        this->scheduleOnce(CC_SCHEDULE_SELECTOR(FieldScene::exit), 3.0f);
+    }
+}
+
+void FieldScene::exit(float)
+{
+    auto menu = MenuScene::create();
+    Director::getInstance()->replaceScene(menu);
 }
 
 void FieldScene::mazeGenerate()

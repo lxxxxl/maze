@@ -46,6 +46,10 @@ public:
     int getTileId(int x, int y);
     // keyboard event handler
     void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+    // display win screen
+    void win();
+    // return to menu
+    void exit(float);
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
