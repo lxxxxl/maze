@@ -58,12 +58,10 @@ endif()
 list(APPEND GAME_SOURCE
      Classes/AppDelegate.cpp
      Classes/FieldScene.cpp
-     Classes/MenuScene.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
      Classes/FieldScene.h
-     Classes/MenuScene.h
      )
 
 if(ANDROID)

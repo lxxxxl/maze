@@ -1,5 +1,4 @@
 #include "FieldScene.h"
-#include "MenuScene.h"
 
 Scene *FieldScene::createScene()
 {
@@ -86,7 +85,7 @@ void FieldScene::win()
 
 void FieldScene::exit(float)
 {
-    auto menu = MenuScene::create();
+    auto menu = FieldScene::create();
     Director::getInstance()->replaceScene(menu);
 }
 
