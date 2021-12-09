@@ -72,6 +72,9 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
                     }
                     break;
 
+                case EventKeyboard::KeyCode::KEY_ESCAPE:
+                    Director::getInstance()->end();
+
                 default:
                     return;
             }

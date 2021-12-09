@@ -7,8 +7,8 @@ USING_NS_CC;
 
 #define SPRITES_PER_LINE    7
 #define SPRITE_SIZE_TILESET 16
-#define FIELD_WIDTH         40
-#define FIELD_HEIGHT        30
+#define FIELD_WIDTH         50
+#define FIELD_HEIGHT        28
 
 
 class FieldScene : public Scene
