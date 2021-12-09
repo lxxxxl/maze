@@ -29,6 +29,10 @@ bool FieldScene::init()
     auto eventListener = EventListenerKeyboard::create();
     eventListener->onKeyPressed = CC_CALLBACK_2(FieldScene::onKeyPressed, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+    //5. run AI
+    findPath();
+
     return true;
 }
 
@@ -417,6 +421,34 @@ void FieldScene::placeEndpoint()
             this->addChild(sprite);
             return;
         }
+}
+
+void FieldScene::findPath()
+{
+    PathFinder pathFinder;
+
+    pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
+    pathFinder.setStartpoint(0, FIELD_HEIGHT - 1);
+    pathFinder.setEndPoint(_endpoint.x / SPRITE_SIZE, _endpoint.y / SPRITE_SIZE);
+    for (int x = 0; x < FIELD_WIDTH; x++)
+        for (int y = 0; y < FIELD_HEIGHT; y++)
+            pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
+
+    pathFinder.findPath();
+    // execute found path
+    Vector<FiniteTimeAction *> aiMovement;
+
+    auto path = pathFinder.getPath();
+    for (auto it = path.begin(); it < path.end(); it++){
+        Cell *c = *it;
+        auto move = MoveTo::create(0.1, Vec2(c->getX() * SPRITE_SIZE, c->getY() * SPRITE_SIZE));
+        aiMovement.pushBack(move);
+
+    }
+
+    auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
+    aiMovement.pushBack(winCallback);
+    _player->runAction(Sequence::create(aiMovement));
 }
 
 void FieldScene::setNewCoords(Sprite *sprite, int x, int y)

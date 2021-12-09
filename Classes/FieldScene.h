@@ -2,7 +2,7 @@
 #define __FIELD_SCENE_H__
 
 #include "cocos2d.h"
-
+#include "PathFinder.h"
 USING_NS_CC;
 
 #define SPRITES_PER_LINE    7
@@ -50,12 +50,13 @@ public:
     void win();
     // return to menu
     void exit(float);
+    // find path to endpoint
+    void findPath();
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Vec2 _endpoint;
     Sprite *_player;
-
 };
 
 #endif // __FIELD_SCENE_H__

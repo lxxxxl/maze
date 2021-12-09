@@ -58,10 +58,14 @@ endif()
 list(APPEND GAME_SOURCE
      Classes/AppDelegate.cpp
      Classes/FieldScene.cpp
+     Classes/PathFinder.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
      Classes/FieldScene.h
+     Classes/Cell.h
+     Classes/Array2D.h
+     Classes/PathFinder.h
      )
 
 if(ANDROID)
