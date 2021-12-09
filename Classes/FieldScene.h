@@ -3,10 +3,10 @@
 
 #include "cocos2d.h"
 #include "PathFinder.h"
+#include "Tiles.h"
+
 USING_NS_CC;
 
-#define SPRITES_PER_LINE    7
-#define SPRITE_SIZE_TILESET 16
 #define FIELD_WIDTH         50
 #define FIELD_HEIGHT        28
 
@@ -37,6 +37,8 @@ public:
     void setNewCoords(Sprite *sprite, int x, int y);
     // generate maze
     void mazeGenerate();
+    // count CLEAR neighbors of cell
+    int countClearNeighbors(int x, int y);
     // optimize maze by removing dead ends
     void mazeOptimize();
     // draw maze on tilemap

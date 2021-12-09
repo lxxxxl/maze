@@ -66,6 +66,7 @@ list(APPEND GAME_HEADER
      Classes/Cell.h
      Classes/Array2D.h
      Classes/PathFinder.h
+     Classes/Tiles.h
      )
 
 if(ANDROID)

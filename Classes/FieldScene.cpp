@@ -26,7 +26,7 @@ bool FieldScene::init()
     placeEndpoint();
 
     // 3. add player
-    _player = spriteFromTileset(252);
+    _player = spriteFromTileset(Objects::Player);
     _player->setPosition(Vec2(0 * _spriteSize, (FIELD_HEIGHT-1) * _spriteSize));
     this->addChild(_player);
 
@@ -207,6 +207,21 @@ void FieldScene::mazeGenerate()
     }
 }
 
+int FieldScene::countClearNeighbors(int x, int y)
+{
+    int neighbors = 0;
+    if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR)
+        neighbors++;
+    if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR)
+        neighbors++;
+    if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR)
+        neighbors++;
+    if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR)
+        neighbors++;
+
+    return neighbors;
+}
+
 void FieldScene::mazeOptimize()
 {
     std::vector<Vec2> deadEnds;
@@ -219,17 +234,9 @@ void FieldScene::mazeOptimize()
                 if ((x == 0) && (y == FIELD_HEIGHT-1))
                     continue;
 
-                int neighbors = 0;
-                if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR)
-                    neighbors++;
-                if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR)
-                    neighbors++;
-                if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR)
-                    neighbors++;
-                if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR)
-                    neighbors++;
 
-                if (neighbors <= 1)
+
+                if (countClearNeighbors(x, y) <= 1)
                     _mazeMap[x][y] = WALL;
             }
     }
@@ -241,7 +248,7 @@ void FieldScene::mazeDraw()
         for (int y = 0; y < FIELD_HEIGHT; y++){
             // add ground tile
             Vec2 pos(x * _spriteSize, y * _spriteSize);
-            auto sprite = spriteFromTileset(3);
+            auto sprite = spriteFromTileset(Objects::Grass);
             sprite->setPosition(pos);
             this->addChild(sprite);
             // add wall
@@ -319,7 +326,7 @@ int FieldScene::getTileId(int x, int y)
     case 0b11011001:
     case 0b00011100:
     case 0b11011101:
-        return 220;
+        return Walls::LeftRight;
 
     case 0b00100010:
     case 0b00111111:
@@ -351,13 +358,13 @@ int FieldScene::getTileId(int x, int y)
     case 0b00110110:
     case 0b01110111:
     case 0b01110000:
-        return 226;
+        return Walls::UpDown;
 
     case 0b00101110:
     case 0b00111010:
     case 0b11101011:
     case 0b00101010:
-        return 218;
+        return Walls::VertRight;
 
 
     case 0b00111000:
@@ -365,42 +372,42 @@ int FieldScene::getTileId(int x, int y)
     case 0b11101111:
     case 0b00101000:
     case 0b00111100:
-        return 219;
+        return Walls::DownRight;
 
     case 0b11100000:
     case 0b11110000:
     case 0b10111111:
     case 0b10100000:
-        return 221;
+        return Walls::DownLeft;
 
     case 0b00001110:
     case 0b00011110:
     case 0b00001010:
     case 0b11111011:
-        return 233;
+        return Walls::UpRight;
 
     case 0b10000011:
     case 0b11111110:
     case 0b10000010:
-        return 235;
+        return Walls::UpLeft;
 
     case 0b11101000:
     case 0b10111000:
     case 0b10101000:
-        return 224;
+        return Walls::HorDown;
 
     case 0b10001110:
     case 0b10101111:
     case 0b11111010:
     case 0b10001011:
     case 0b10001010:
-        return 225;
+        return Walls::HorUp;
 
     case 0b10111110:
     case 0b10100011:
     case 0b10100010:
     case 0b11100010:
-        return 217;
+        return Walls::VertLeft;
 
     case 0b10111011:
     case 0b10101011:
@@ -409,11 +416,11 @@ int FieldScene::getTileId(int x, int y)
     case 0b11101010:
     case 0b10101110:
     case 0b10101010:
-        return 227;
+        return Walls::Cross;
 
     default:
-        return _wallTiles[RandomHelper::random_int(0, (int)sizeof(_wallTiles)-1)];
-
+        return countClearNeighbors(x, y) == 0 ? InnerObstacles[RandomHelper::random_int(0, (int)InnerObstacles.size() - 1)]
+                                              : OuterObstacles[RandomHelper::random_int(0, (int)OuterObstacles.size() - 1)];
     }
 }
 
@@ -425,7 +432,7 @@ void FieldScene::placeEndpoint()
                 continue;
 
             _endpoint = Vec2(x * _spriteSize, y * _spriteSize);
-            auto sprite = spriteFromTileset(207);
+            auto sprite = spriteFromTileset(Objects::ExitOpen);
             sprite->setPosition(_endpoint);
             this->addChild(sprite);
             return;
@@ -470,7 +477,7 @@ Sprite *FieldScene::spriteFromTileset(int gid)
 {
     int y = gid / SPRITES_PER_LINE;
     int x = gid % SPRITES_PER_LINE;
-    auto sprite = Sprite::create("toen.png", Rect(x * SPRITE_SIZE_TILESET, y * SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET));
+    auto sprite = Sprite::create(TilesFilename, Rect(x * SPRITE_SIZE_TILESET, y * SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET));
     sprite->setScale(float(_spriteSize) / SPRITE_SIZE_TILESET);
     sprite->getTexture()->setAliasTexParameters();  // remove antialiasing because it corrupts tiles
     sprite->setAnchorPoint(Vec2(0, 0));
