@@ -14,6 +14,11 @@ bool FieldScene::init()
         return false;
     }
 
+    // 2. init scaler
+    int screenWidth = Director::getInstance()->getOpenGLView()->getFrameSize().width;
+    _spriteSize = screenWidth / FIELD_WIDTH;
+
+
     // 2. generate maze
     mazeGenerate();
     mazeOptimize();
@@ -22,7 +27,7 @@ bool FieldScene::init()
 
     // 3. add player
     _player = spriteFromTileset(252);
-    _player->setPosition(Vec2(0 * SPRITE_SIZE, (FIELD_HEIGHT-1) * SPRITE_SIZE));
+    _player->setPosition(Vec2(0 * _spriteSize, (FIELD_HEIGHT-1) * _spriteSize));
     this->addChild(_player);
 
     //4. add keyboard listener
@@ -38,8 +43,8 @@ bool FieldScene::init()
 
 void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-    int x = _player->getPosition().x / SPRITE_SIZE;
-    int y = _player->getPosition().y / SPRITE_SIZE;
+    int x = _player->getPosition().x / _spriteSize;
+    int y = _player->getPosition().y / _spriteSize;
 
     auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
     MoveBy *action = nullptr;
@@ -47,23 +52,23 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
     switch(keyCode){
                 case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
                     if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(-SPRITE_SIZE, 0));
+                        action = MoveBy::create(0.1f, Vec2(-_spriteSize, 0));
 
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
                     if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(SPRITE_SIZE, 0));
+                        action = MoveBy::create(0.1f, Vec2(_spriteSize, 0));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_UP_ARROW:
                     if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(0, SPRITE_SIZE));
+                        action = MoveBy::create(0.1f, Vec2(0, _spriteSize));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
                     if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(0, -SPRITE_SIZE));
+                        action = MoveBy::create(0.1f, Vec2(0, -_spriteSize));
                     }
                     break;
 
@@ -232,7 +237,7 @@ void FieldScene::mazeDraw()
         for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++){
             // add ground tile
-            Vec2 pos(x * SPRITE_SIZE, y * SPRITE_SIZE);
+            Vec2 pos(x * _spriteSize, y * _spriteSize);
             auto sprite = spriteFromTileset(3);
             sprite->setPosition(pos);
             this->addChild(sprite);
@@ -240,7 +245,7 @@ void FieldScene::mazeDraw()
             auto tile = getTileId(x, y);
             if (_mazeMap[x][y] != WALL)
                 continue;
-            pos = Vec2(x * SPRITE_SIZE, y * SPRITE_SIZE);
+            pos = Vec2(x * _spriteSize, y * _spriteSize);
             auto sprite2 = spriteFromTileset(tile);
             sprite2->setPosition(pos);
             this->addChild(sprite2);
@@ -415,7 +420,7 @@ void FieldScene::placeEndpoint()
             if (_mazeMap[x][y] == WALL)
                 continue;
 
-            _endpoint = Vec2(x*SPRITE_SIZE, y * SPRITE_SIZE);
+            _endpoint = Vec2(x * _spriteSize, y * _spriteSize);
             auto sprite = spriteFromTileset(207);
             sprite->setPosition(_endpoint);
             this->addChild(sprite);
@@ -429,7 +434,7 @@ void FieldScene::findPath()
 
     pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
     pathFinder.setStartpoint(0, FIELD_HEIGHT - 1);
-    pathFinder.setEndPoint(_endpoint.x / SPRITE_SIZE, _endpoint.y / SPRITE_SIZE);
+    pathFinder.setEndPoint(_endpoint.x / _spriteSize, _endpoint.y / _spriteSize);
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++)
             pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
@@ -441,7 +446,7 @@ void FieldScene::findPath()
     auto path = pathFinder.getPath();
     for (auto it = path.begin(); it < path.end(); it++){
         Cell *c = *it;
-        auto move = MoveTo::create(0.1, Vec2(c->getX() * SPRITE_SIZE, c->getY() * SPRITE_SIZE));
+        auto move = MoveTo::create(0.1, Vec2(c->getX() * _spriteSize, c->getY() * _spriteSize));
         aiMovement.pushBack(move);
 
     }
@@ -453,7 +458,7 @@ void FieldScene::findPath()
 
 void FieldScene::setNewCoords(Sprite *sprite, int x, int y)
 {
-    auto action = MoveTo::create(0.05f, Vec2(x * SPRITE_SIZE, y * SPRITE_SIZE));
+    auto action = MoveTo::create(0.05f, Vec2(x * _spriteSize, y * _spriteSize));
     sprite->runAction(action);
 }
 
@@ -461,7 +466,9 @@ Sprite *FieldScene::spriteFromTileset(int gid)
 {
     int y = gid / SPRITES_PER_LINE;
     int x = gid % SPRITES_PER_LINE;
-    auto sprite = Sprite::create("toen.png", Rect(x * SPRITE_SIZE, y * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE));
+    auto sprite = Sprite::create("toen.png", Rect(x * SPRITE_SIZE_TILESET, y * SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET));
+    sprite->setScale(float(_spriteSize) / SPRITE_SIZE_TILESET);
+    sprite->getTexture()->setAliasTexParameters();  // remove antialiasing because it corrupts tiles
     sprite->setAnchorPoint(Vec2(0, 0));
     return sprite;
 }

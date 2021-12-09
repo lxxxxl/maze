@@ -6,9 +6,10 @@
 USING_NS_CC;
 
 #define SPRITES_PER_LINE    7
-#define SPRITE_SIZE         16
+#define SPRITE_SIZE_TILESET 16
 #define FIELD_WIDTH         40
 #define FIELD_HEIGHT        30
+
 
 class FieldScene : public Scene
 {
@@ -57,6 +58,8 @@ private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Vec2 _endpoint;
     Sprite *_player;
+    int _spriteSize;
+
 };
 
 #endif // __FIELD_SCENE_H__
