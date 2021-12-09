@@ -361,6 +361,7 @@ int FieldScene::getTileId(int x, int y)
     case 0b01111000:
     case 0b11101111:
     case 0b00101000:
+    case 0b00111100:
         return 219;
 
     case 0b11100000:
