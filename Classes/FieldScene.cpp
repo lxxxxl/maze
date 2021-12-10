@@ -358,6 +358,7 @@ int FieldScene::getTileId(int x, int y)
     case 0b00110110:
     case 0b01110111:
     case 0b01110000:
+    case 0b11110111:
         return Walls::UpDown;
 
     case 0b00101110:
@@ -384,6 +385,7 @@ int FieldScene::getTileId(int x, int y)
     case 0b00011110:
     case 0b00001010:
     case 0b11111011:
+    case 0b00001111:
         return Walls::UpRight;
 
     case 0b10000011:
@@ -394,10 +396,10 @@ int FieldScene::getTileId(int x, int y)
     case 0b11101000:
     case 0b10111000:
     case 0b10101000:
+    case 0b10101111:
         return Walls::HorDown;
 
     case 0b10001110:
-    case 0b10101111:
     case 0b11111010:
     case 0b10001011:
     case 0b10001010:
