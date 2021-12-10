@@ -30,15 +30,12 @@ enum Objects{
     Grass = 3,
     Player = 250,
     ExitClosed = 297,
-    ExitOpen = 299,
-    Checkpoint1 = 44,
-    Checkpoint2 = 45,
-    Checkpoint3 = 46,
-    Checkpoint4 = 47,
+    ExitOpen = 299
 };
 
 static vector<uint16_t> InnerObstacles = {7, 8, 9, 14, 15, 16, 17, 21, 34, 42, 43, 164, 188};
 static vector<uint16_t> OuterObstacles = {4, 5, 6, 10, 11, 12, 13, 27, 202, 209, 238, 239, 237};
+static vector<uint16_t> Checkpoints = {44, 45, 46, 47};
 
 static char *TilesFilename = "toen.png";
 

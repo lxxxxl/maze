@@ -24,6 +24,7 @@ bool FieldScene::init()
     mazeOptimize();
     mazeDraw();
     placeEndpoint();
+    placeCheckpoints();
 
     // 3. add player
     _player = spriteFromTileset(Objects::Player);
@@ -36,7 +37,7 @@ bool FieldScene::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
     //5. run AI
-    findPath();
+    //findPath();
 
     return true;
 }
@@ -84,7 +85,32 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 
 void FieldScene::win()
 {
-    if ((_player->getPosition().x == _endpoint.x) && (_player->getPosition().y == _endpoint.y)){
+    // check if we reached checkpoint
+    for (int i = 0; i < _checkpoints.size(); i++){
+        Sprite *checkpoint = _checkpoints.at(i);
+        if ((_player->getPosition().x == checkpoint->getPositionX()) &&
+                (_player->getPosition().y == checkpoint->getPositionY())){
+
+            //checkpoint->setVisible(false);
+            checkpoint->removeFromParent();
+            _checkpoints.eraseObject(checkpoint);
+            //checkpoint->removeFromParent();
+            if (_checkpoints.size() == 0){
+                auto pos = _endpoint->getPosition();
+                //_endpoint->setVisible(false);
+                _endpoint->removeFromParent();
+                _endpoint = spriteFromTileset(Objects::ExitOpen);
+                _endpoint->setPosition(pos);
+                this->addChild(_endpoint);
+                _endpoint->setTag(EXIT_OPEN);
+            }
+            break;
+        }
+    }
+    // check if we reached endpoint
+    if ((_player->getPosition().x == _endpoint->getPositionX()) &&
+            (_player->getPosition().y == _endpoint->getPositionY()) &&
+            (_endpoint->getTag() == EXIT_OPEN)){
         int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
         int centerY = Director::getInstance()->getOpenGLView()->getFrameSize().height / 2;
         auto sprite = Sprite::create("like.png");
@@ -433,12 +459,36 @@ void FieldScene::placeEndpoint()
             if (_mazeMap[x][y] == WALL)
                 continue;
 
-            _endpoint = Vec2(x * _spriteSize, y * _spriteSize);
-            auto sprite = spriteFromTileset(Objects::ExitOpen);
-            sprite->setPosition(_endpoint);
-            this->addChild(sprite);
+            _endpoint = spriteFromTileset(Objects::ExitClosed);
+            _endpoint->setPosition(Vec2(x * _spriteSize, y * _spriteSize));
+            this->addChild(_endpoint);
+            _endpoint->setTag(EXIT_CLOSED);
             return;
         }
+}
+
+void FieldScene::placeCheckpoints()
+{
+    for (int i = 0; i < CHECKPOINTS_COUNT; i++){
+        int x = 0;
+        int y = 0;
+        do{
+            x = RandomHelper::random_int(0, FIELD_WIDTH - 1);
+            y = RandomHelper::random_int(0, FIELD_HEIGHT - 1);
+        }while(_mazeMap[x][y] != CLEAR);
+        auto pos = Vec2(x * _spriteSize, y * _spriteSize);
+        // check if checkpoint already placed here
+        for (auto s: _checkpoints){
+            if ((s->getPositionX() == pos.x) && (s->getPositionY() == pos.y)){
+                i--;
+                continue;
+            }
+        }
+        auto sprite = spriteFromTileset(Checkpoints[RandomHelper::random_int(0, (int)Checkpoints.size() - 1)]);
+        sprite->setPosition(pos);
+        this->addChild(sprite);
+        _checkpoints.pushBack(sprite);
+    }
 }
 
 void FieldScene::findPath()
@@ -447,7 +497,7 @@ void FieldScene::findPath()
 
     pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
     pathFinder.setStartpoint(0, FIELD_HEIGHT - 1);
-    pathFinder.setEndPoint(_endpoint.x / _spriteSize, _endpoint.y / _spriteSize);
+    pathFinder.setEndPoint(_endpoint->getPositionX() / _spriteSize, _endpoint->getPositionY() / _spriteSize);
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++)
             pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);

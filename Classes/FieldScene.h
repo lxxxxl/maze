@@ -9,6 +9,7 @@ USING_NS_CC;
 
 #define FIELD_WIDTH         50
 #define FIELD_HEIGHT        28
+#define CHECKPOINTS_COUNT   5
 
 
 class FieldScene : public Scene
@@ -45,6 +46,8 @@ public:
     void mazeDraw();
     // locate and draw endpoint
     void placeEndpoint();
+    // locate and draw checkpoints
+    void placeCheckpoints();
     // get wall tile acording to road position
     int getTileId(int x, int y);
     // keyboard event handler
@@ -58,9 +61,11 @@ public:
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
-    Vec2 _endpoint;
+    Sprite *_endpoint;
+    Vector<Sprite *> _checkpoints;
     Sprite *_player;
     int _spriteSize;
+    int _checkpointsReached;
 
 };
 
