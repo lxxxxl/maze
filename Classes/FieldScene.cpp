@@ -37,7 +37,7 @@ bool FieldScene::init()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
     //5. run AI
-    //findPath();
+    findPath();
 
     return true;
 }
@@ -494,28 +494,42 @@ void FieldScene::placeCheckpoints()
 void FieldScene::findPath()
 {
     PathFinder pathFinder;
+    Vector<FiniteTimeAction *> aiMovement;
+    auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
 
     pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
-    pathFinder.setStartpoint(0, FIELD_HEIGHT - 1);
-    pathFinder.setEndPoint(_endpoint->getPositionX() / _spriteSize, _endpoint->getPositionY() / _spriteSize);
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++)
             pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
 
-    pathFinder.findPath();
-    // execute found path
-    Vector<FiniteTimeAction *> aiMovement;
+    Sprite *startPoint = _player;
+    // process checkpoints
+    for (Sprite *s: _checkpoints){
+        pathFinder.setStartpoint(startPoint->getPositionX() / _spriteSize, startPoint->getPositionY() / _spriteSize);
+        pathFinder.setEndPoint(s->getPositionX() / _spriteSize, s->getPositionY() / _spriteSize);
+        pathFinder.findPath();
+        auto path = pathFinder.getPath();
+        for (auto it = path.begin(); it < path.end(); it++){
+            Cell *c = *it;
+            auto move = MoveTo::create(0.1, Vec2(c->getX() * _spriteSize, c->getY() * _spriteSize));
+            aiMovement.pushBack(move);
+        }
+        aiMovement.pushBack(winCallback->clone());
+        startPoint = s;
+    }
 
+    // process endpoint
+    pathFinder.setStartpoint(startPoint->getPositionX() / _spriteSize, startPoint->getPositionY() / _spriteSize);
+    pathFinder.setEndPoint(_endpoint->getPositionX() / _spriteSize, _endpoint->getPositionY() / _spriteSize);
+    pathFinder.findPath();
     auto path = pathFinder.getPath();
     for (auto it = path.begin(); it < path.end(); it++){
         Cell *c = *it;
         auto move = MoveTo::create(0.1, Vec2(c->getX() * _spriteSize, c->getY() * _spriteSize));
         aiMovement.pushBack(move);
-
     }
+    aiMovement.pushBack(winCallback->clone());
 
-    auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
-    aiMovement.pushBack(winCallback);
     _player->runAction(Sequence::create(aiMovement));
 }
 

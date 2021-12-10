@@ -49,6 +49,16 @@ void PathFinder::setEndPoint(int x, int y)
 
 void PathFinder::findPath()
 {
+    // cleanup cell's metadata
+    for (int x = 0; x < _fieldWidth; x++)
+        for (int y = 0; y < _fieldHeight; y++){
+            auto cell = _pathMap.Get(x, y);
+            cell->setDistance(0);
+            cell->setLastX(-1);
+            cell->setLastY(-1);
+            cell->setMarked(false);
+        }
+
     // array with cells to check
     vector<Cell*> checkCells;
 
@@ -96,6 +106,7 @@ void PathFinder::findPath()
     }
 
     // generate path
+    _path.clear();
     Cell* cell = _pathMap.Get(g_goalX,g_goalY);
     while(cell->getLastX() != -1){
         _path.push_front(cell);
