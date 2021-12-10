@@ -67,12 +67,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto glview = director->getOpenGLView();
     if(!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
+        int count = 0;
         glview = GLViewImpl::createWithFullScreen("maze");
 #else
         glview = GLViewImpl::create("maze");
 #endif
         director->setOpenGLView(glview);
     }
+
+    // setup screen resolution
+    director->getOpenGLView()->setFrameSize(1600, 900);
 
     // turn on display FPS
     director->setDisplayStats(false);
