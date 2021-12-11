@@ -6,10 +6,9 @@
 #include "Cell.h"
 #include "Array2D.h"
 
-/* A* path finding implementation
+/* Djkstra path finding implementation
  * based on https://github.com/waitingfy/Cocos2d-x_PathFinding
  */
-
 class PathFinder
 {
 public:
@@ -25,6 +24,8 @@ public:
     void setStartpoint(int x, int y);
     // set end point
     void setEndPoint(int x, int y);
+    // set checkpoint
+    void setCheckpoint(int x, int y);
     // perform pathfinding
     void findPath();
     // get calculated path
@@ -37,9 +38,6 @@ private:
     int _fieldWidth;
     int _fieldHeight;
 
-    int _startposX;
-    int _startposY;
-
     const int DIRECTION[4][2]={
         {0,1},  //north
         {1,0},  //east
@@ -49,6 +47,13 @@ private:
 
     Array2D<Cell> _pathMap;
     deque<Cell*> _path;
+    vector<Cell*> _checkpoints;
+
+    // saves path to checkpoint to _path
+    void savePathTo(int x, int y);
+    // cleanup cell's metadata
+    void cleanup();
+
 };
 
 #endif // PATHFINDER_H
