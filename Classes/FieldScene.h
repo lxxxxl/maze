@@ -50,8 +50,11 @@ public:
     void placeCheckpoints();
     // get wall tile acording to road position
     int getTileId(int x, int y);
-    // keyboard event handler
+    // keyboard event handlers
     void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+    void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+    void keypress(EventKeyboard::KeyCode keyCode);
+    void keyhold(float);
     // display win screen
     void win();
     // return to menu
@@ -66,6 +69,8 @@ private:
     Sprite *_player;
     int _spriteSize;
     int _checkpointsReached;
+    EventKeyboard::KeyCode _pressedKey;
+    time_t _lastKeypress;
 
 };
 

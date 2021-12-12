@@ -1,4 +1,5 @@
 #include "FieldScene.h"
+#include <sys/timeb.h>
 
 Scene *FieldScene::createScene()
 {
@@ -34,18 +35,49 @@ bool FieldScene::init()
     //4. add keyboard listener
     auto eventListener = EventListenerKeyboard::create();
     eventListener->onKeyPressed = CC_CALLBACK_2(FieldScene::onKeyPressed, this);
+    eventListener->onKeyReleased = CC_CALLBACK_2(FieldScene::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
     //5. run AI
-    findPath();
+    //findPath();
 
+    _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
+    _lastKeypress = 0;
     return true;
+}
+
+void FieldScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+    _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
 }
 
 void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
+    _pressedKey = keyCode;
+    keyhold(0);
+}
+
+void FieldScene::keyhold(float)
+{
+    if (_pressedKey != EventKeyboard::KeyCode::KEY_NONE){
+        keypress(_pressedKey);
+        this->scheduleOnce(CC_SCHEDULE_SELECTOR(FieldScene::keyhold), 0.1f);
+    }
+}
+
+void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
+{
     int x = _player->getPosition().x / _spriteSize;
     int y = _player->getPosition().y / _spriteSize;
+
+    // fix to prevent walk through walls
+    struct timeval  tv;
+    gettimeofday(&tv, NULL);
+    long time_in_mill =  (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ; // co
+    if ((time_in_mill - _lastKeypress) < 100)
+        return;
+    _lastKeypress = time_in_mill;
+
 
     auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
     MoveBy *action = nullptr;
@@ -53,23 +85,23 @@ void FieldScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
     switch(keyCode){
                 case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
                     if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(-_spriteSize, 0));
+                        action = MoveBy::create(0.08f, Vec2(-_spriteSize, 0));
 
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
                     if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(_spriteSize, 0));
+                        action = MoveBy::create(0.08f, Vec2(_spriteSize, 0));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_UP_ARROW:
                     if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(0, _spriteSize));
+                        action = MoveBy::create(0.08f, Vec2(0, _spriteSize));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
                     if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR){
-                        action = MoveBy::create(0.1f, Vec2(0, -_spriteSize));
+                        action = MoveBy::create(0.08f, Vec2(0, -_spriteSize));
                     }
                     break;
 
