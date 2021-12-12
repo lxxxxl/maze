@@ -38,9 +38,7 @@ bool FieldScene::init()
     eventListener->onKeyReleased = CC_CALLBACK_2(FieldScene::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
-    //5. run AI
-    //findPath();
-
+    //5. init some vars
     _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
     _lastKeypress = 0;
     return true;
@@ -107,6 +105,10 @@ void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
 
                 case EventKeyboard::KeyCode::KEY_ESCAPE:
                     Director::getInstance()->end();
+
+                case EventKeyboard::KeyCode::KEY_SPACE:
+                    findPath();
+                    return;
 
                 default:
                     return;
