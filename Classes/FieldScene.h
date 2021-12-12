@@ -58,7 +58,7 @@ public:
     // display win screen
     void win();
     // return to menu
-    void exit(float);
+    void exit();
     // find path to endpoint
     void findPath();
 

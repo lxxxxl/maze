@@ -146,14 +146,22 @@ void FieldScene::win()
         int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
         int centerY = Director::getInstance()->getOpenGLView()->getFrameSize().height / 2;
         auto sprite = Sprite::create("like.png");
-        sprite->setScale(4.0f);
+        // make some animation
+        sprite->setScale(1.0f);
         sprite->setPosition(Vec2(centerX, centerY));
         addChild(sprite);
-        this->scheduleOnce(CC_SCHEDULE_SELECTOR(FieldScene::exit), 3.0f);
+
+        auto scale1 = ScaleTo::create(1.0f, RandomHelper::random_real(4.0f, 8.0f),
+                                            RandomHelper::random_real(4.0f, 8.0f));
+        auto scale2 = ScaleTo::create(1.0f, RandomHelper::random_real(1.0f, 4.0f),
+                                            RandomHelper::random_real(1.0f, 4.0f));
+        auto scale3 = ScaleTo::create(1.0f, 10.0f, 10.0f);
+        auto exitCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::exit, this));
+        sprite->runAction(Sequence::create(scale1, scale2, scale3, exitCallback, nullptr));
     }
 }
 
-void FieldScene::exit(float)
+void FieldScene::exit()
 {
     auto menu = FieldScene::create();
     Director::getInstance()->replaceScene(menu);
