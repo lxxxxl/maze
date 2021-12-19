@@ -153,13 +153,7 @@ void FieldScene::win()
             AudioEngine::play2d("flag.wav");
             _checkpointsLabel->setString(std::to_string(_checkpoints.size()));
             if (_checkpoints.size() == 0){
-                auto pos = _endpoint->getPosition();
-                //_endpoint->setVisible(false);
-                _endpoint->removeFromParent();
-                _endpoint = spriteFromTileset(Objects::ExitOpen);
-                _endpoint->setPosition(pos);
-                this->addChild(_endpoint);
-                _endpoint->setTag(EXIT_OPEN);
+                _endpoint->setVisible(true);
             }
             break;
         }
@@ -167,7 +161,7 @@ void FieldScene::win()
     // check if we reached endpoint
     if ((_player->getPosition().x == _endpoint->getPositionX()) &&
             (_player->getPosition().y == _endpoint->getPositionY()) &&
-            (_endpoint->getTag() == EXIT_OPEN)){
+            _endpoint->isVisible()){
         // crutch to prevent movement after win
         _aiActive = true;
         // play sound
@@ -528,10 +522,10 @@ void FieldScene::placeEndpoint()
             if (_mazeMap[x][y] == WALL)
                 continue;
 
-            _endpoint = spriteFromTileset(Objects::ExitClosed);
+            _endpoint = spriteFromTileset(Objects::Exit);
             _endpoint->setPosition(Vec2(x * _spriteSize, y * _spriteSize));
             this->addChild(_endpoint);
-            _endpoint->setTag(EXIT_CLOSED);
+            _endpoint->setVisible(false);
             return;
         }
 }

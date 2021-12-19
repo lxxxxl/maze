@@ -6,9 +6,6 @@
 
 using namespace std;
 
-#define EXIT_CLOSED 0
-#define EXIT_OPEN 1
-
 #define SPRITES_PER_LINE    7
 #define SPRITE_SIZE_TILESET 16
 
@@ -29,8 +26,7 @@ enum Walls{
 enum Objects{
     Grass = 3,
     Player = 250,
-    ExitClosed = 297,
-    ExitOpen = 299
+    Exit = 207
 };
 
 static vector<uint16_t> InnerObstacles = {7, 8, 9, 14, 15, 16, 17, 21, 34, 42, 43, 164, 188};
