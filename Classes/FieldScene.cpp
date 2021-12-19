@@ -58,6 +58,11 @@ bool FieldScene::init()
 
 void FieldScene::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
+    if (keyCode == EventKeyboard::KeyCode::KEY_CTRL){
+        for (Sprite *sprite: _checkpointsHighlights){
+            sprite->setVisible(false);
+        }
+    }
     _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
 }
 
@@ -132,6 +137,13 @@ void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
                     }
                     return;
 
+                 case EventKeyboard::KeyCode::KEY_CTRL:
+                    for (Sprite *sprite: _checkpointsHighlights){
+                        sprite->setVisible(true);
+                    }
+                    return;
+
+
                 default:
                     return;
             }
@@ -146,6 +158,13 @@ void FieldScene::win()
         Sprite *checkpoint = _checkpoints.at(i);
         if ((_player->getPosition().x == checkpoint->getPositionX()) &&
                 (_player->getPosition().y == checkpoint->getPositionY())){
+
+            for (Sprite *sprite: _checkpointsHighlights){
+                if (sprite->getPosition() == checkpoint->getPosition()){
+                    sprite->removeFromParent();
+                    _checkpointsHighlights.eraseObject(sprite);
+                }
+            }
 
             checkpoint->removeFromParent();
             _checkpoints.eraseObject(checkpoint);
@@ -551,6 +570,13 @@ void FieldScene::placeCheckpoints()
         sprite->setPosition(pos);
         this->addChild(sprite);
         _checkpoints.pushBack(sprite);
+
+        // highliter for checkpoint
+        auto s = spriteFromTileset(Objects::CheckpointHighlighter);
+        s->setPosition(sprite->getPosition());
+        s->setVisible(false);
+        _checkpointsHighlights.pushBack(s);
+        addChild(s);
     }
 }
 

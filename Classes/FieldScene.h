@@ -10,7 +10,7 @@ USING_NS_CC;
 
 #define FIELD_WIDTH         50
 #define FIELD_HEIGHT        28
-#define CHECKPOINTS_COUNT   5
+#define CHECKPOINTS_COUNT   10
 
 
 class FieldScene : public Scene
@@ -67,6 +67,7 @@ private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Sprite *_endpoint;
     Vector<Sprite *> _checkpoints;
+    Vector<Sprite *> _checkpointsHighlights;
     Sprite *_player;
     Label *_checkpointsLabel;
     int _spriteSize;
