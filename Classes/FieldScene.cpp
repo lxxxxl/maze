@@ -41,6 +41,7 @@ bool FieldScene::init()
     //5. init some vars
     _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
     _lastKeypress = 0;
+    _aiActive = false;
     return true;
 }
 
@@ -82,23 +83,23 @@ void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
 
     switch(keyCode){
                 case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-                    if ((x - 1 >= 0) && _mazeMap[x - 1][y] == CLEAR){
+                    if ((x - 1 >= 0) && (_mazeMap[x - 1][y] == CLEAR) && (!_aiActive)){
                         action = MoveBy::create(0.08f, Vec2(-_spriteSize, 0));
 
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-                    if ((x + 1 < FIELD_WIDTH) && _mazeMap[x + 1][y] == CLEAR){
+                    if ((x + 1 < FIELD_WIDTH) && (_mazeMap[x + 1][y] == CLEAR) && (!_aiActive)){
                         action = MoveBy::create(0.08f, Vec2(_spriteSize, 0));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_UP_ARROW:
-                    if ((y + 1 < FIELD_HEIGHT) && _mazeMap[x][y + 1] == CLEAR){
+                    if ((y + 1 < FIELD_HEIGHT) && (_mazeMap[x][y + 1] == CLEAR) && (!_aiActive)){
                         action = MoveBy::create(0.08f, Vec2(0, _spriteSize));
                     }
                     break;
                 case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-                    if ((y - 1 >= 0) && _mazeMap[x][y - 1] == CLEAR){
+                    if ((y - 1 >= 0) && (_mazeMap[x][y - 1] == CLEAR) && (!_aiActive)){
                         action = MoveBy::create(0.08f, Vec2(0, -_spriteSize));
                     }
                     break;
@@ -107,7 +108,17 @@ void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
                     Director::getInstance()->end();
 
                 case EventKeyboard::KeyCode::KEY_SPACE:
-                    findPath();
+                    if (_aiActive){
+                        _player->stopAllActions();
+                        _aiActive = false;
+                        // fix player position
+                        x = _player->getPosition().x / _spriteSize;
+                        y = _player->getPosition().y / _spriteSize;
+                        _player->setPosition(Vec2(x * _spriteSize, y * _spriteSize));
+                    }
+                    else{
+                        findPath();
+                    }
                     return;
 
                 default:
@@ -145,6 +156,8 @@ void FieldScene::win()
     if ((_player->getPosition().x == _endpoint->getPositionX()) &&
             (_player->getPosition().y == _endpoint->getPositionY()) &&
             (_endpoint->getTag() == EXIT_OPEN)){
+        // crutch to prevent movement after win
+        _aiActive = true;
         int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
         int centerY = Director::getInstance()->getOpenGLView()->getFrameSize().height / 2;
         auto sprite = Sprite::create("like.png");
@@ -557,6 +570,7 @@ void FieldScene::findPath()
         aiMovement.pushBack(winCallback->clone());
     }
 
+    _aiActive = true;
     _player->runAction(Sequence::create(aiMovement));
 }
 

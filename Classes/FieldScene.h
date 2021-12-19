@@ -71,6 +71,7 @@ private:
     int _checkpointsReached;
     EventKeyboard::KeyCode _pressedKey;
     time_t _lastKeypress;
+    bool _aiActive;
 
 };
 
