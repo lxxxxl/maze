@@ -136,10 +136,10 @@ void FieldScene::win()
         if ((_player->getPosition().x == checkpoint->getPositionX()) &&
                 (_player->getPosition().y == checkpoint->getPositionY())){
 
-            //checkpoint->setVisible(false);
             checkpoint->removeFromParent();
             _checkpoints.eraseObject(checkpoint);
-            //checkpoint->removeFromParent();
+            // play sound
+            AudioEngine::play2d("flag.wav");
             if (_checkpoints.size() == 0){
                 auto pos = _endpoint->getPosition();
                 //_endpoint->setVisible(false);
@@ -158,6 +158,8 @@ void FieldScene::win()
             (_endpoint->getTag() == EXIT_OPEN)){
         // crutch to prevent movement after win
         _aiActive = true;
+        // play sound
+        AudioEngine::play2d("win.wav");
         int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
         int centerY = Director::getInstance()->getOpenGLView()->getFrameSize().height / 2;
         auto sprite = Sprite::create("like.png");

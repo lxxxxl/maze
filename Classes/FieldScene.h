@@ -2,6 +2,7 @@
 #define __FIELD_SCENE_H__
 
 #include "cocos2d.h"
+#include "audio/include/AudioEngine.h"
 #include "PathFinder.h"
 #include "Tiles.h"
 
