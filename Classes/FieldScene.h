@@ -68,6 +68,7 @@ private:
     Sprite *_endpoint;
     Vector<Sprite *> _checkpoints;
     Sprite *_player;
+    Label *_checkpointsLabel;
     int _spriteSize;
     int _checkpointsReached;
     EventKeyboard::KeyCode _pressedKey;

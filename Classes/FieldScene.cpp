@@ -17,31 +17,42 @@ bool FieldScene::init()
 
     // 2. init scaler
     int screenWidth = Director::getInstance()->getOpenGLView()->getFrameSize().width;
+    int screenHeight = Director::getInstance()->getOpenGLView()->getFrameSize().height;
     _spriteSize = screenWidth / FIELD_WIDTH;
 
-
-    // 2. generate maze
+    // 3. generate maze
     mazeGenerate();
     mazeOptimize();
     mazeDraw();
     placeEndpoint();
     placeCheckpoints();
 
-    // 3. add player
+    // 4. add checkpoints counter
+    _checkpointsLabel = Label::createWithSystemFont(std::to_string(_checkpoints.size()), "Arial", 48);
+    auto pos = Vec2(screenWidth - 40, screenHeight - 40);
+    _checkpointsLabel->setPosition(pos);
+    addChild(_checkpointsLabel);
+
+    // 5. add player
     _player = spriteFromTileset(Objects::Player);
     _player->setPosition(Vec2(0 * _spriteSize, (FIELD_HEIGHT-1) * _spriteSize));
     this->addChild(_player);
 
-    //4. add keyboard listener
+    // 6. add keyboard listener
     auto eventListener = EventListenerKeyboard::create();
     eventListener->onKeyPressed = CC_CALLBACK_2(FieldScene::onKeyPressed, this);
     eventListener->onKeyReleased = CC_CALLBACK_2(FieldScene::onKeyReleased, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
-    //5. init some vars
+    // 7. init some vars
     _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
     _lastKeypress = 0;
     _aiActive = false;
+
+    // 8. preload sounds
+    AudioEngine::preload("flag.wav");
+    AudioEngine::preload("win.wav");
+
     return true;
 }
 
@@ -140,6 +151,7 @@ void FieldScene::win()
             _checkpoints.eraseObject(checkpoint);
             // play sound
             AudioEngine::play2d("flag.wav");
+            _checkpointsLabel->setString(std::to_string(_checkpoints.size()));
             if (_checkpoints.size() == 0){
                 auto pos = _endpoint->getPosition();
                 //_endpoint->setVisible(false);
