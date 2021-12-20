@@ -33,6 +33,7 @@ enum Objects{
 static vector<uint16_t> InnerObstacles = {7, 8, 9, 14, 15, 16, 17, 21, 34, 42, 43, 164, 188};
 static vector<uint16_t> OuterObstacles = {4, 5, 6, 10, 11, 12, 13, 27, 202, 209, 238, 239, 237};
 static vector<uint16_t> Checkpoints = {44, 45, 46, 47};
+static vector<uint16_t> Enemies = {114, 115, 118, 120, 121, 122, 126};
 
 static string TilesFilename = "toen.png";
 

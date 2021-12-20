@@ -26,6 +26,7 @@ bool FieldScene::init()
     mazeDraw();
     placeEndpoint();
     placeCheckpoints();
+    placeEnemies();
 
     // 4. add checkpoints counter
     _checkpointsLabel = Label::createWithSystemFont(std::to_string(_checkpoints.size()), "Arial", 48);
@@ -578,6 +579,56 @@ void FieldScene::placeCheckpoints()
         _checkpointsHighlights.pushBack(s);
         addChild(s);
     }
+}
+void FieldScene::placeEnemies()
+{
+    // init one pathfinder for all enemies
+    PathFinder pathFinder;
+    pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
+    for (int x = 0; x < FIELD_WIDTH; x++)
+        for (int y = 0; y < FIELD_HEIGHT; y++)
+            pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
+
+    // create enemies
+    for (int i = 0; i < ENEMIES_COUNT; i++){
+        int x = 0;
+        int y = 0;
+        do{
+            x = RandomHelper::random_int(0, FIELD_WIDTH - 1);
+            y = RandomHelper::random_int(0, FIELD_HEIGHT - 1);
+        }while(_mazeMap[x][y] != CLEAR);
+        auto pos = Vec2(x * _spriteSize, y * _spriteSize);
+        // check if checkpoint already placed here
+        for (auto s: _enemies){
+            if ((s->getPositionX() == pos.x) && (s->getPositionY() == pos.y)){
+                i--;
+                continue;
+            }
+        }
+
+        // init enemy tile
+        int tile = Enemies[RandomHelper::random_int(0, (int)Enemies.size() - 1)];
+        auto enemy = Enemy::create(TilesFilename, Rect((tile % SPRITES_PER_LINE) * SPRITE_SIZE_TILESET, (tile / SPRITES_PER_LINE) * SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET, SPRITE_SIZE_TILESET));
+        enemy->setScale(float(_spriteSize) / SPRITE_SIZE_TILESET);
+        enemy->getTexture()->setAliasTexParameters();  // remove antialiasing because it corrupts tiles
+        enemy->setAnchorPoint(Vec2(0, 0));
+        enemy->setPosition(pos);
+        addChild(enemy);
+        _enemies.pushBack(enemy);
+
+        // init enemy AI
+        auto collisionCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::collisionCheck, this, enemy));
+        enemy->setSpriteSize(_spriteSize);
+        enemy->setSpeed(ENEMIES_SPEED);
+        enemy->setCollideCallback(collisionCallback);
+        enemy->setPathFinder(&pathFinder);
+        enemy->walk(0, FIELD_HEIGHT-1);
+    }
+}
+
+void FieldScene::collisionCheck(Enemy* enemy)
+{
+
 }
 
 void FieldScene::findPath()

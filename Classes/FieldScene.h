@@ -5,12 +5,15 @@
 #include "audio/include/AudioEngine.h"
 #include "PathFinder.h"
 #include "Tiles.h"
+#include "Enemy.h"
 
 USING_NS_CC;
 
 #define FIELD_WIDTH         50
 #define FIELD_HEIGHT        28
 #define CHECKPOINTS_COUNT   10
+#define ENEMIES_COUNT       3
+#define ENEMIES_SPEED       0.3f
 
 
 class FieldScene : public Scene
@@ -49,6 +52,8 @@ public:
     void placeEndpoint();
     // locate and draw checkpoints
     void placeCheckpoints();
+    // locate and run enemies
+    void placeEnemies();
     // get wall tile acording to road position
     int getTileId(int x, int y);
     // keyboard event handlers
@@ -62,12 +67,15 @@ public:
     void exit();
     // find path to endpoint
     void findPath();
+    // collision check for enemies
+    void collisionCheck(Enemy* enemy);
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
     Sprite *_endpoint;
     Vector<Sprite *> _checkpoints;
     Vector<Sprite *> _checkpointsHighlights;
+    Vector<Enemy *> _enemies;
     Sprite *_player;
     Label *_checkpointsLabel;
     int _spriteSize;

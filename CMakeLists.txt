@@ -59,6 +59,7 @@ list(APPEND GAME_SOURCE
      Classes/AppDelegate.cpp
      Classes/FieldScene.cpp
      Classes/PathFinder.cpp
+     Classes/Enemy.cpp
      )
 list(APPEND GAME_HEADER
      Classes/AppDelegate.h
@@ -67,6 +68,7 @@ list(APPEND GAME_HEADER
      Classes/Array2D.h
      Classes/PathFinder.h
      Classes/Tiles.h
+     Classes/Enemy.h
      )
 
 if(ANDROID)
