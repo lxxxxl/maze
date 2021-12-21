@@ -26,13 +26,19 @@ bool FieldScene::init()
     mazeDraw();
     placeEndpoint();
     placeCheckpoints();
-    placeEnemies();
 
-    // 4. add checkpoints counter
+    // 4. add labels
     _checkpointsLabel = Label::createWithSystemFont(std::to_string(_checkpoints.size()), "Arial", 48);
-    auto pos = Vec2(screenWidth - 40, screenHeight - 40);
+    auto pos = Vec2(screenWidth - 40, screenHeight - 80);
     _checkpointsLabel->setPosition(pos);
     addChild(_checkpointsLabel);
+
+    _levelLabel = Label::createWithSystemFont(std::to_string(_checkpoints.size()), "Arial", 48);
+    pos = Vec2(screenWidth - 40, screenHeight - 40);
+    _levelLabel->setPosition(pos);
+    addChild(_levelLabel);
+    _levelLabel->setString(to_string(1));
+
 
     // 5. add player
     _player = spriteFromTileset(Objects::Player);
@@ -49,6 +55,7 @@ bool FieldScene::init()
     _pressedKey = EventKeyboard::KeyCode::KEY_NONE;
     _lastKeypress = 0;
     _aiActive = false;
+    _level = 1;
 
     // 8. preload sounds
     AudioEngine::preload("flag.wav");
@@ -183,6 +190,9 @@ void FieldScene::win()
             _endpoint->isVisible()){
         // crutch to prevent movement after win
         _aiActive = true;
+        // stop enemies
+        for (auto enemy: _enemies)
+            enemy->stopAllActions();
         // play sound
         AudioEngine::play2d("win.wav");
         int centerX = Director::getInstance()->getOpenGLView()->getFrameSize().width / 2;
@@ -203,9 +213,12 @@ void FieldScene::win()
     }
 }
 
-void FieldScene::exit(float)
+void FieldScene::exit(float dt)
 {
     auto scene = FieldScene::create();
+    if (!dt)
+        _level++;
+    scene->updateLevel(_level);
     Director::getInstance()->replaceScene(scene);
 }
 
@@ -578,7 +591,7 @@ generateCoords:
         addChild(s);
     }
 }
-void FieldScene::placeEnemies()
+void FieldScene::placeEnemies(int count)
 {
     // init pathfinder
     _pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
@@ -587,7 +600,7 @@ void FieldScene::placeEnemies()
             _pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
 
     // create enemies
-    for (int i = 0; i < ENEMIES_COUNT; i++){
+    for (int i = 0; i < count; i++){
         int x = 0;
         int y = 0;
         do{
@@ -623,6 +636,12 @@ void FieldScene::placeEnemies()
     }
 }
 
+void FieldScene::updateLevel(int level){
+    _level = level;
+    _levelLabel->setString(to_string(_level));
+    int enemiesCount = trunc(_level / 3);
+    placeEnemies(enemiesCount);
+}
 void FieldScene::collisionCheck(Enemy* enemy)
 {
     // check if player within 2 tiles from enemy

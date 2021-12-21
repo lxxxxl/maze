@@ -12,8 +12,7 @@ USING_NS_CC;
 #define FIELD_WIDTH         50
 #define FIELD_HEIGHT        28
 #define CHECKPOINTS_COUNT   10
-#define ENEMIES_COUNT       3
-#define ENEMIES_SPEED       0.3f
+#define ENEMIES_SPEED       0.4f
 
 
 class FieldScene : public Scene
@@ -53,14 +52,14 @@ public:
     // locate and draw checkpoints
     void placeCheckpoints();
     // locate and run enemies
-    void placeEnemies();
+    void placeEnemies(int count);
     // get wall tile acording to road position
     int getTileId(int x, int y);
     // keyboard event handlers
     void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
     void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
     void keypress(EventKeyboard::KeyCode keyCode);
-    void keyhold(float);
+    void keyhold(float dt);
     // display win screen
     void win();
     // return to menu
@@ -69,6 +68,9 @@ public:
     void findPath();
     // collision check for enemies
     void collisionCheck(Enemy* enemy);
+    // update current level to calculate count of enemies
+    // +1 enemy every 3 levels
+    void updateLevel(int level);
 
 private:
     u_char _mazeMap[FIELD_WIDTH][FIELD_HEIGHT];
@@ -79,11 +81,13 @@ private:
     PathFinder _pathFinder;
     Sprite *_player;
     Label *_checkpointsLabel;
+    Label *_levelLabel;
     int _spriteSize;
     int _checkpointsReached;
     EventKeyboard::KeyCode _pressedKey;
     time_t _lastKeypress;
     bool _aiActive;
+    int _level;
 
 };
 
