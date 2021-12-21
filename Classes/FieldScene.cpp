@@ -198,15 +198,15 @@ void FieldScene::win()
         auto scale2 = ScaleTo::create(1.0f, RandomHelper::random_real(1.0f, 4.0f),
                                             RandomHelper::random_real(1.0f, 4.0f));
         auto scale3 = ScaleTo::create(1.0f, 10.0f, 10.0f);
-        auto exitCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::exit, this));
+        auto exitCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::exit, this, 0));
         sprite->runAction(Sequence::create(scale1, scale2, scale3, exitCallback, nullptr));
     }
 }
 
-void FieldScene::exit()
+void FieldScene::exit(float)
 {
-    auto menu = FieldScene::create();
-    Director::getInstance()->replaceScene(menu);
+    auto scene = FieldScene::create();
+    Director::getInstance()->replaceScene(scene);
 }
 
 void FieldScene::mazeGenerate()
@@ -627,9 +627,18 @@ void FieldScene::placeEnemies()
 void FieldScene::collisionCheck(Enemy* enemy)
 {
     // check if player within 2 tiles from enemy
-    if ((abs(_player->getPositionX() - enemy->getPositionX()) < _spriteSize * 2) &&
-        (abs(_player->getPositionY() - enemy->getPositionY()) < _spriteSize * 2))
-        exit();
+    if (_player->isVisible() &&
+    (abs(_player->getPositionX() - enemy->getPositionX()) < _spriteSize * 2) &&
+    (abs(_player->getPositionY() - enemy->getPositionY()) < _spriteSize * 2)){
+        auto dead = spriteFromTileset(Objects::Dead);
+        dead->setPosition(_player->getPosition());
+        _player->stopAllActions();
+        _player->setVisible(false);
+        addChild(dead);
+        AudioEngine::play2d("dead.wav");
+        this->scheduleOnce(CC_SCHEDULE_SELECTOR(FieldScene::exit), 2.0f);
+        return;
+    }
     // recreate collision callback because it crashes on subsequent walk() calls
     // object deleted on from stack?
     auto collisionCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::collisionCheck, this, enemy));

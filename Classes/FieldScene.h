@@ -64,7 +64,7 @@ public:
     // display win screen
     void win();
     // return to menu
-    void exit();
+    void exit(float);
     // find path to endpoint
     void findPath();
     // collision check for enemies

@@ -27,7 +27,8 @@ enum Objects{
     Grass = 3,
     Player = 250,
     Exit = 207,
-    CheckpointHighlighter = 298
+    CheckpointHighlighter = 298,
+    Dead = 301
 };
 
 static vector<uint16_t> InnerObstacles = {7, 8, 9, 14, 15, 16, 17, 21, 34, 42, 43, 164, 188};
