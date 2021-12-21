@@ -94,7 +94,6 @@ void FieldScene::keypress(EventKeyboard::KeyCode keyCode)
         return;
     _lastKeypress = time_in_mill;
 
-
     auto winCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::win, this));
     MoveBy *action = nullptr;
 
@@ -582,12 +581,11 @@ void FieldScene::placeCheckpoints()
 }
 void FieldScene::placeEnemies()
 {
-    // init one pathfinder for all enemies
-    PathFinder pathFinder;
-    pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
+    // init pathfinder
+    _pathFinder.setDimensions(FIELD_WIDTH, FIELD_HEIGHT);
     for (int x = 0; x < FIELD_WIDTH; x++)
         for (int y = 0; y < FIELD_HEIGHT; y++)
-            pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
+            _pathFinder.setPassable(x, y, _mazeMap[x][y] == CLEAR);
 
     // create enemies
     for (int i = 0; i < ENEMIES_COUNT; i++){
@@ -621,14 +619,22 @@ void FieldScene::placeEnemies()
         enemy->setSpriteSize(_spriteSize);
         enemy->setSpeed(ENEMIES_SPEED);
         enemy->setCollideCallback(collisionCallback);
-        enemy->setPathFinder(&pathFinder);
+        enemy->setPathFinder(&_pathFinder);
         enemy->walk(0, FIELD_HEIGHT-1);
     }
 }
 
 void FieldScene::collisionCheck(Enemy* enemy)
 {
-
+    // check if player within 2 tiles from enemy
+    if ((abs(_player->getPositionX() - enemy->getPositionX()) < _spriteSize * 2) &&
+        (abs(_player->getPositionY() - enemy->getPositionY()) < _spriteSize * 2))
+        exit();
+    // recreate collision callback because it crashes on subsequent walk() calls
+    // object deleted on from stack?
+    auto collisionCallback = CallFunc::create(CC_CALLBACK_0(FieldScene::collisionCheck, this, enemy));
+    enemy->setCollideCallback(collisionCallback);
+    enemy->walk(_player->getPosition().x / _spriteSize, _player->getPosition().y / _spriteSize);
 }
 
 void FieldScene::findPath()

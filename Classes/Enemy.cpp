@@ -18,14 +18,13 @@ Enemy* Enemy::create(string filename, Rect rect)
 
 void Enemy::walk(int x, int y)
 {
+    if ((x == _playerX) && (y == _playerY))
+        return;
+
     _playerX = x;
     _playerY = y;
 
     stopAllActions();
-    // fix position
-    x = getPosition().x / _spriteSize;
-    y = getPosition().y / _spriteSize;
-    setPosition(Vec2(x * _spriteSize, y * _spriteSize));
 
     // find path
     Vector<FiniteTimeAction *> aiMovement;
@@ -40,6 +39,6 @@ void Enemy::walk(int x, int y)
         aiMovement.pushBack(move);
         aiMovement.pushBack(_collideCallback->clone());
     }
-
-    runAction(Sequence::create(aiMovement));
+    if (aiMovement.size() > 0)
+        runAction(Sequence::create(aiMovement));
 }

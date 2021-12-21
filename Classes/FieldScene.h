@@ -76,6 +76,7 @@ private:
     Vector<Sprite *> _checkpoints;
     Vector<Sprite *> _checkpointsHighlights;
     Vector<Enemy *> _enemies;
+    PathFinder _pathFinder;
     Sprite *_player;
     Label *_checkpointsLabel;
     int _spriteSize;
