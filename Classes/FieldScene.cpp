@@ -551,9 +551,10 @@ void FieldScene::placeEndpoint()
 
 void FieldScene::placeCheckpoints()
 {
-    for (int i = 0; i < CHECKPOINTS_COUNT; i++){
+    while (_checkpoints.size() < CHECKPOINTS_COUNT){
         int x = 0;
         int y = 0;
+generateCoords:
         do{
             x = RandomHelper::random_int(0, FIELD_WIDTH - 1);
             y = RandomHelper::random_int(0, FIELD_HEIGHT - 1);
@@ -561,14 +562,12 @@ void FieldScene::placeCheckpoints()
         auto pos = Vec2(x * _spriteSize, y * _spriteSize);
         // check if checkpoint already placed here
         for (auto s: _checkpoints){
-            if ((s->getPositionX() == pos.x) && (s->getPositionY() == pos.y)){
-                i--;
-                continue;
-            }
+            if ((s->getPositionX() == pos.x) && (s->getPositionY() == pos.y))
+                goto generateCoords;
         }
         auto sprite = spriteFromTileset(Checkpoints[RandomHelper::random_int(0, (int)Checkpoints.size() - 1)]);
         sprite->setPosition(pos);
-        this->addChild(sprite);
+        addChild(sprite);
         _checkpoints.pushBack(sprite);
 
         // highliter for checkpoint
